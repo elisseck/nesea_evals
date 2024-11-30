@@ -1,0 +1,5 @@
+name: NESEA Evals
+description: Modifies the session_evaluation form for NESEA conferences
+package: Custom
+type: module
+core_version_requirement: ^8 || ^9 || ^10 || ^11

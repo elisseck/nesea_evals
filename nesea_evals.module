@@ -1,15 +1,16 @@
 <?php
-function nesea_evals_form_alter(&$form, &$form_state, $form_id) {
-   if ($form_id == 'session_evaluation_node_form') {
+
+function nesea_evals_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id) {
+   if ($form_id == 'node_session_evaluation_form') {
      $sessionID = $_GET["id"];
      $conferenceID = $_GET["conference"];
-     $form['field_session_link']['und']['#default_value'] = $sessionID;
-     $form['field_conference_link']['und']['#default_value'] = $conferenceID;
-     $form['field_session_link']['#disabled'] = TRUE;
-     $form['field_conference_link']['#disabled'] = TRUE;
+     $form['field_session']['und']['#default_value'] = $sessionID;
+     $form['field_conference']['und']['#default_value'] = $conferenceID;
+     $form['field_session']['#disabled'] = TRUE;
+     $form['field_conference']['#disabled'] = TRUE;
      $node = node_load($sessionID);
      $speakersArray = $node->field_session_speakers['und'];
-     civicrm_initialize();
+     \Drupal::service('civicrm')->initialize();
      foreach ($speakersArray as $key => $id) {
         $user = user_load($id);
         if ($user) {
@@ -18,19 +19,19 @@ function nesea_evals_form_alter(&$form, &$form_state, $form_id) {
             'return' => array("first_name", "last_name", "current_employer"),
             'email' => $user->mail,
           ));
-          $form['field_rate']['und'][$key]['field_speaker_name']['und'][0]['value']['#default_value'] = $result["values"][0]["first_name"];
-          $form['field_rate']['und'][$key]['field_speaker_last_name']['und'][0]['value']['#default_value'] = $result["values"][0]["last_name"];
-          $form['field_rate']['und'][$key]['field_speaker_org']['und'][0]['value']['#default_value'] = $result["values"][0]["current_employer"];
-          
-          $form['field_rate']['und'][$key]['field_speaker_name']['#disabled'] = TRUE;
-          $form['field_rate']['und'][$key]['field_speaker_last_name']['#disabled'] = TRUE;
-          $form['field_rate']['und'][$key]['field_speaker_org']['#disabled'] = TRUE;
+          $form['field_rate_the_speakers']['und'][$key]['field_speaker_first_name']['und'][0]['value']['#default_value'] = $result["values"][0]["first_name"];
+          $form['field_rate_the_speakers']['und'][$key]['field_speaker_last_name']['und'][0]['value']['#default_value'] = $result["values"][0]["last_name"];
+          $form['field_rate_the_speakers']['und'][$key]['field_speaker_organization']['und'][0]['value']['#default_value'] = $result["values"][0]["current_employer"];
+
+          $form['field_rate_the_speakers']['und'][$key]['field_speaker_first_name']['#disabled'] = TRUE;
+          $form['field_rate_the_speakers']['und'][$key]['field_speaker_last_name']['#disabled'] = TRUE;
+          $form['field_rate_the_speakers']['und'][$key]['field_speaker_organization']['#disabled'] = TRUE;
         }
      }
-     foreach ($form['field_rate']['und'] as $key => $item) {
-        if ($form['field_rate']['und'][$key]['field_speaker_name']) {
-          if ($form['field_rate']['und'][$key]['field_speaker_name']['und'][0]['value']['#default_value'] == NULL) {
-            $form['field_rate']['und'][$key]['#access'] = FALSE;
+     foreach ($form['field_rate_the_speakers']['und'] as $key => $item) {
+        if ($form['field_rate_the_speakers']['und'][$key]['field_speaker_first_name']) {
+          if ($form['field_rate_the_speakers']['und'][$key]['field_speaker_first_name']['und'][0]['value']['#default_value'] == NULL) {
+            $form['field_rate_the_speakers']['und'][$key]['#access'] = FALSE;
           }
         }
      }
