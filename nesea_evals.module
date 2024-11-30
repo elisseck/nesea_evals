@@ -4,20 +4,23 @@ function nesea_evals_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $fo
    if ($form_id == 'node_session_evaluation_form') {
      $sessionID = $_GET["id"];
      $conferenceID = $_GET["conference"];
-     $form['field_session']['und']['#default_value'] = $sessionID;
-     $form['field_conference']['und']['#default_value'] = $conferenceID;
+     $node = \Drupal\node\Entity\Node::load($sessionID);
+     $conference_node = \Drupal\node\Entity\Node::load($conferenceID);
+     $form['field_session']['widget'][0]['target_id']['#default_value'] = $node;
+     $form['field_conference']['widget'][0]['target_id']['#default_value'] = $conference_node;
      $form['field_session']['#disabled'] = TRUE;
      $form['field_conference']['#disabled'] = TRUE;
      $node = \Drupal\node\Entity\Node::load($sessionID);
-     $speakersArray = $node->field_session_speakers['und'];
+     $speakersArray = $node->field_session_speakers->getValue();
      \Drupal::service('civicrm')->initialize();
-     foreach ($speakersArray as $key => $id) {
+     foreach ($speakersArray as $key => $value) {
+        $id = $value['target_id'];
         $user = \Drupal\user\Entity\User::load($id);
         if ($user) {
           $result = civicrm_api3('Contact', 'get', array(
             'sequential' => 1,
             'return' => array("first_name", "last_name", "current_employer"),
-            'email' => $user->mail,
+            'email' => $user->mail->value,
           ));
           $form['field_rate_the_speakers']['und'][$key]['field_speaker_first_name']['und'][0]['value']['#default_value'] = $result["values"][0]["first_name"];
           $form['field_rate_the_speakers']['und'][$key]['field_speaker_last_name']['und'][0]['value']['#default_value'] = $result["values"][0]["last_name"];
