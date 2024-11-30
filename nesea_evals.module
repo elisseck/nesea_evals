@@ -8,11 +8,11 @@ function nesea_evals_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $fo
      $form['field_conference']['und']['#default_value'] = $conferenceID;
      $form['field_session']['#disabled'] = TRUE;
      $form['field_conference']['#disabled'] = TRUE;
-     $node = node_load($sessionID);
+     $node = \Drupal\node\Entity\Node::load($sessionID);
      $speakersArray = $node->field_session_speakers['und'];
      \Drupal::service('civicrm')->initialize();
      foreach ($speakersArray as $key => $id) {
-        $user = user_load($id);
+        $user = \Drupal\user\Entity\User::load($id);
         if ($user) {
           $result = civicrm_api3('Contact', 'get', array(
             'sequential' => 1,
