@@ -4,6 +4,9 @@ function nesea_evals_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $fo
    if ($form_id == 'node_session_evaluation_form') {
      $sessionID = $_GET["id"];
      $conferenceID = $_GET["conference"];
+     if (!$sessionID || !$conferenceID) {
+       return;
+     }
      $node = \Drupal\node\Entity\Node::load($sessionID);
      $conference_node = \Drupal\node\Entity\Node::load($conferenceID);
      $form['field_session']['widget'][0]['target_id']['#default_value'] = $node;
