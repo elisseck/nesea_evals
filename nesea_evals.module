@@ -7,6 +7,7 @@ function nesea_evals_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $fo
      if (!$sessionID || !$conferenceID) {
        return;
      }
+     $form['#attached']['library'][] = 'nesea_evals/nesea_evals';
      $node = \Drupal\node\Entity\Node::load($sessionID);
      $conference_node = \Drupal\node\Entity\Node::load($conferenceID);
      $form['field_session']['widget'][0]['target_id']['#default_value'] = $node;
@@ -25,13 +26,17 @@ function nesea_evals_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $fo
             'return' => array("first_name", "last_name", "current_employer"),
             'email' => $user->mail->value,
           ));
-          $form['field_rate_the_speakers']['und'][$key]['field_speaker_first_name']['und'][0]['value']['#default_value'] = $result["values"][0]["first_name"];
-          $form['field_rate_the_speakers']['und'][$key]['field_speaker_last_name']['und'][0]['value']['#default_value'] = $result["values"][0]["last_name"];
-          $form['field_rate_the_speakers']['und'][$key]['field_speaker_organization']['und'][0]['value']['#default_value'] = $result["values"][0]["current_employer"];
-
-          $form['field_rate_the_speakers']['und'][$key]['field_speaker_first_name']['#disabled'] = TRUE;
-          $form['field_rate_the_speakers']['und'][$key]['field_speaker_last_name']['#disabled'] = TRUE;
-          $form['field_rate_the_speakers']['und'][$key]['field_speaker_organization']['#disabled'] = TRUE;
+          $speaker = $result['values'][0];
+          $form['#attached']['drupalSettings']['nesea_evals']['speakers'][$speaker['id']]['first_name'] = $speaker['first_name'];
+          $form['#attached']['drupalSettings']['nesea_evals']['speakers'][$speaker['id']]['last_name'] = $speaker['last_name'];
+          $form['#attached']['drupalSettings']['nesea_evals']['speakers'][$speaker['id']]['current_employer'] = $speaker['current_employer'];
+          //$form['field_rate_the_speakers']['und'][$key]['field_speaker_first_name']['und'][0]['value']['#default_value'] = $result["values"][0]["first_name"];
+          //$form['field_rate_the_speakers']['und'][$key]['field_speaker_last_name']['und'][0]['value']['#default_value'] = $result["values"][0]["last_name"];
+          //$form['field_rate_the_speakers']['und'][$key]['field_speaker_organization']['und'][0]['value']['#default_value'] = $result["values"][0]["current_employer"];
+$form['field_rate_the_speakers'][0]['inline_entity_form']['field_speaker_first_name'][0]['#default_value'] = 'test';
+          //$form['field_rate_the_speakers']['und'][$key]['field_speaker_first_name']['#disabled'] = TRUE;
+          //$form['field_rate_the_speakers']['und'][$key]['field_speaker_last_name']['#disabled'] = TRUE;
+          //$form['field_rate_the_speakers']['und'][$key]['field_speaker_organization']['#disabled'] = TRUE;
         }
      }
      foreach ($form['field_rate_the_speakers']['und'] as $key => $item) {
@@ -42,4 +47,12 @@ function nesea_evals_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $fo
         }
      }
    }
-};
+}
+
+function nesea_evals_inline_entity_form_entity_form_alter(array &$entity_form, Drupal\Core\Form\FormState &$form_state) {
+  if ($entity_form['#entity_type'] == 'node' && $entity_form['#bundle'] == 'presenter_rating') {
+var_dump($entity_form['field_speaker_first_name']['widget']);
+//die();
+    $entity_form['field_speaker_first_name']['widget'][0]['value']['#default_value'] = 'test';
+  }
+}

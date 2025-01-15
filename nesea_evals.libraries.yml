@@ -1,0 +1,6 @@
+nesea_evals:
+  version: 1.x
+  js:
+    js/nesea_evals.js: {}
+  dependencies:
+    - core/jquery
