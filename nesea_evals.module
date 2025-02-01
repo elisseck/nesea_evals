@@ -59,24 +59,25 @@ function nesea_evals_inline_entity_form_entity_form_alter(array &$entity_form, D
     $node = \Drupal\node\Entity\Node::load($sessionID);
     $speakersArray = $node->field_session_speakers->getValue();
     \Drupal::service('civicrm')->initialize();
+    $widget_key = 0;
     foreach ($speakersArray as $key => $value) {
-       $id = $value['target_id'];
-       $user = \Drupal\user\Entity\User::load($id);
-       if ($user) {
-         $result = civicrm_api3('Contact', 'get', array(
-           'sequential' => 1,
-           'return' => array("first_name", "last_name", "current_employer"),
-           'email' => $user->mail->value,
-         ));
-         $speaker = $result['values'][0];
-         $entity_form['field_speaker_first_name']['widget'][0]['value']['#default_value'] = $speaker['first_name'];
-         $entity_form['field_speaker_first_name']['widget'][0]['#disabled'] = TRUE;
-         $entity_form['field_speaker_last_name']['widget'][0]['value']['#default_value'] = $speaker['last_name'];
-         $entity_form['field_speaker_organization']['widget'][0]['value']['#default_value'] = $speaker['current_employer'];
-       }
-     }
-var_dump($entity_form['field_speaker_first_name']['widget']);
-//die();
-    $entity_form['field_speaker_first_name']['widget'][0]['value']['#default_value'] = 'test';
+      $id = $value['target_id'];
+      $user = \Drupal\user\Entity\User::load($id);
+      if ($user) {
+        $result = civicrm_api3('Contact', 'get', array(
+          'sequential' => 1,
+          'return' => array("first_name", "last_name", "current_employer"),
+          'email' => $user->mail->value,
+        ));
+        $speaker = $result['values'][0];
+        $entity_form['field_speaker_first_name']['widget'][$widget_key]['value']['#default_value'] = $speaker['first_name'];
+        $entity_form['field_speaker_first_name']['widget'][$widget_key]['#disabled'] = TRUE;
+        $entity_form['field_speaker_last_name']['widget'][$widget_key]['value']['#default_value'] = $speaker['last_name'];
+        $entity_form['field_speaker_last_name']['widget'][$widget_key]['#disabled'] = TRUE;
+        $entity_form['field_speaker_organization']['widget'][$widget_key]['value']['#default_value'] = $speaker['current_employer'];
+        $entity_form['field_speaker_organization']['widget'][$widget_key]['#disabled'] = TRUE;
+      }
+      $widget_key++;
+    }
   }
 }
