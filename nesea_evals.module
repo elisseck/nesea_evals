@@ -51,6 +51,30 @@ $form['field_rate_the_speakers'][0]['inline_entity_form']['field_speaker_first_n
 
 function nesea_evals_inline_entity_form_entity_form_alter(array &$entity_form, Drupal\Core\Form\FormState &$form_state) {
   if ($entity_form['#entity_type'] == 'node' && $entity_form['#bundle'] == 'presenter_rating') {
+    $sessionID = $_GET["id"];
+    $conferenceID = $_GET["conference"];
+    if (!$sessionID || !$conferenceID) {
+      return;
+    }
+    $node = \Drupal\node\Entity\Node::load($sessionID);
+    $speakersArray = $node->field_session_speakers->getValue();
+    \Drupal::service('civicrm')->initialize();
+    foreach ($speakersArray as $key => $value) {
+       $id = $value['target_id'];
+       $user = \Drupal\user\Entity\User::load($id);
+       if ($user) {
+         $result = civicrm_api3('Contact', 'get', array(
+           'sequential' => 1,
+           'return' => array("first_name", "last_name", "current_employer"),
+           'email' => $user->mail->value,
+         ));
+         $speaker = $result['values'][0];
+         $entity_form['field_speaker_first_name']['widget'][0]['value']['#default_value'] = $speaker['first_name'];
+         $entity_form['field_speaker_first_name']['widget'][0]['#disabled'] = TRUE;
+         $entity_form['field_speaker_last_name']['widget'][0]['value']['#default_value'] = $speaker['last_name'];
+         $entity_form['field_speaker_organization']['widget'][0]['value']['#default_value'] = $speaker['current_employer'];
+       }
+     }
 var_dump($entity_form['field_speaker_first_name']['widget']);
 //die();
     $entity_form['field_speaker_first_name']['widget'][0]['value']['#default_value'] = 'test';
