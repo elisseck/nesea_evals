@@ -39,19 +39,16 @@ function nesea_evals_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $fo
             '#type' => 'text',
             '#title' => t('First Name'),
             '#default_value' => $speaker['first_name'],
-            '#disabled' => TRUE,
           ];
           $form['field_speaker_last_name_' . $key] = [
             '#type' => 'text',
             '#title' => t('Last Name'),
             '#default_value' => $speaker['last_name'],
-            '#disabled' => TRUE,
           ];
           $form['field_speaker_current_employer_' . $key] = [
             '#type' => 'text',
             '#title' => t('Company/Organization'),
             '#default_value' => $speaker['current_employer'],
-            '#disabled' => TRUE,
           ];
           $form['field_speaker_rating_' . $key] = [
             '#type' => 'select',
