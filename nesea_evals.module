@@ -16,7 +16,12 @@ function nesea_evals_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $fo
     $node = \Drupal\node\Entity\Node::load($sessionID);
     $speakersArray = $node->field_session_speakers->getValue();
     \Drupal::service('civicrm')->initialize();
-    $weight = 10;
+    $weight = 1000;
+    $form['fieldset_speakers'] = [
+      '#type' => 'fieldset',
+      '#title' => 'Rate the speakers: Where 1 is poor and 5 is excellent',
+    ];
+    $weight++;
     foreach ($speakersArray as $key => $value) {
       $id = $value['target_id'];
       $user = \Drupal\user\Entity\User::load($id);
@@ -27,7 +32,7 @@ function nesea_evals_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $fo
           'email' => $user->mail->value,
         ));
         $speaker = $result['values'][0];
-        $form['field_speaker_first_name_' . $key] = [
+        $form['fieldset_speakers']['field_speaker_first_name_' . $key] = [
           '#type' => 'textfield',
           '#title' => t('First Name'),
           '#default_value' => $speaker['first_name'],
@@ -35,7 +40,7 @@ function nesea_evals_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $fo
           '#weight' => $weight,
         ];
         $weight++;
-        $form['field_speaker_last_name_' . $key] = [
+        $form['fieldset_speakers']['field_speaker_last_name_' . $key] = [
           '#type' => 'textfield',
           '#title' => t('Last Name'),
           '#default_value' => $speaker['last_name'],
@@ -43,7 +48,7 @@ function nesea_evals_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $fo
           '#weight' => $weight,
         ];
         $weight++;
-        $form['field_speaker_current_employer_' . $key] = [
+        $form['fieldset_speakers']['field_speaker_current_employer_' . $key] = [
           '#type' => 'textfield',
           '#title' => t('Company/Organization'),
           '#default_value' => $speaker['current_employer'],
@@ -51,7 +56,7 @@ function nesea_evals_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $fo
           '#weight' => $weight,
         ];
         $weight++;
-        $form['field_speaker_rating_' . $key] = [
+        $form['fieldset_speakers']['field_speaker_rating_' . $key] = [
           '#type' => 'select',
           '#title' => t('Rate This Speaker'),
           '#options' => [
