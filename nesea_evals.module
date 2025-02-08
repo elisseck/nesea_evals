@@ -2,7 +2,7 @@
 
 function nesea_evals_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id) {
   if ($form_id == 'node_session_evaluation_form') {
-    if (!$form['field_rate_the_speakers']['und'][0]['target_id']) {
+    if (!$form['field_rate_the_speakers']['widget'][0]['target_id']['#default_value']) {
       $sessionID = $_GET["id"];
       $conferenceID = $_GET["conference"];
       if (!$sessionID || !$conferenceID) {
@@ -10,7 +10,7 @@ function nesea_evals_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $fo
       }
       $node = \Drupal\node\Entity\Node::load($sessionID);
       $conference_node = \Drupal\node\Entity\Node::load($conferenceID);
-      $form['title']['#default_value'] = $node->title  . ' Evaluation (submitted from: ' . \Drupal::request()->getClientIp() . ')';
+      $form['title']['#default_value'] = $node->getTitle()  . ' Evaluation (submitted from: ' . \Drupal::request()->getClientIp() . ')';
       $form['title']['#access'] = FALSE;
       $form['field_session']['widget'][0]['target_id']['#default_value'] = $node;
       $form['field_conference']['widget'][0]['target_id']['#default_value'] = $conference_node;
