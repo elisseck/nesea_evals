@@ -2,74 +2,79 @@
 
 function nesea_evals_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id) {
   if ($form_id == 'node_session_evaluation_form') {
-    $sessionID = $_GET["id"];
-    $conferenceID = $_GET["conference"];
-    if (!$sessionID || !$conferenceID) {
-      return;
-    }
-    $node = \Drupal\node\Entity\Node::load($sessionID);
-    $conference_node = \Drupal\node\Entity\Node::load($conferenceID);
-    $form['field_session']['widget'][0]['target_id']['#default_value'] = $node;
-    $form['field_conference']['widget'][0]['target_id']['#default_value'] = $conference_node;
-    $form['field_session']['#disabled'] = TRUE;
-    $form['field_conference']['#disabled'] = TRUE;
-    $node = \Drupal\node\Entity\Node::load($sessionID);
-    $speakersArray = $node->field_session_speakers->getValue();
-    \Drupal::service('civicrm')->initialize();
-    $weight = 1000;
-    $form['fieldset_speakers'] = [
-      '#type' => 'fieldset',
-      '#title' => 'Rate the speakers: Where 1 is poor and 5 is excellent',
-      '#weight' => $weight,
-    ];
-    $weight++;
-    foreach ($speakersArray as $key => $value) {
-      $id = $value['target_id'];
-      $user = \Drupal\user\Entity\User::load($id);
-      if ($user) {
-        $result = civicrm_api3('Contact', 'get', array(
-          'sequential' => 1,
-          'return' => array("first_name", "last_name", "current_employer"),
-          'email' => $user->mail->value,
-        ));
-        $speaker = $result['values'][0];
-        $form['fieldset_speakers']['field_speaker_first_name_' . $key] = [
-          '#type' => 'textfield',
-          '#title' => t('First Name'),
-          '#default_value' => $speaker['first_name'],
-          '#disabled' => TRUE,
-          '#weight' => $weight,
-        ];
-        $weight++;
-        $form['fieldset_speakers']['field_speaker_last_name_' . $key] = [
-          '#type' => 'textfield',
-          '#title' => t('Last Name'),
-          '#default_value' => $speaker['last_name'],
-          '#disabled' => TRUE,
-          '#weight' => $weight,
-        ];
-        $weight++;
-        $form['fieldset_speakers']['field_speaker_current_employer_' . $key] = [
-          '#type' => 'textfield',
-          '#title' => t('Company/Organization'),
-          '#default_value' => $speaker['current_employer'],
-          '#disabled' => TRUE,
-          '#weight' => $weight,
-        ];
-        $weight++;
-        $form['fieldset_speakers']['field_speaker_rating_' . $key] = [
-          '#type' => 'select',
-          '#title' => t('Rate This Speaker'),
-          '#options' => [
-            1 => 1,
-            2 => 2,
-            3 => 3,
-            4 => 4,
-            5 => 5,
-          ],
-          '#weight' => $weight,
-        ];
-        $weight++;
+    if (!$form['field_rate_the_speakers']['und'][0]['target_id']) {
+      $sessionID = $_GET["id"];
+      $conferenceID = $_GET["conference"];
+      if (!$sessionID || !$conferenceID) {
+        return;
+      }
+      $node = \Drupal\node\Entity\Node::load($sessionID);
+      $conference_node = \Drupal\node\Entity\Node::load($conferenceID);
+      $form['title']['#default_value'] = $node->title  . ' Evaluation (submitted from: ' . \Drupal::request()->getClientIp() . ')';
+      $form['title']['#access'] = FALSE;
+      $form['field_session']['widget'][0]['target_id']['#default_value'] = $node;
+      $form['field_conference']['widget'][0]['target_id']['#default_value'] = $conference_node;
+      $form['field_session']['#disabled'] = TRUE;
+      $form['field_conference']['#disabled'] = TRUE;
+      $form['field_rate_the_speakers']['#access'] = FALSE;
+      $node = \Drupal\node\Entity\Node::load($sessionID);
+      $speakersArray = $node->field_session_speakers->getValue();
+      \Drupal::service('civicrm')->initialize();
+      $weight = 1000;
+      $form['fieldset_speakers'] = [
+        '#type' => 'fieldset',
+        '#title' => 'Rate the speakers: Where 1 is poor and 5 is excellent',
+        '#weight' => $weight,
+      ];
+      $weight++;
+      foreach ($speakersArray as $key => $value) {
+        $id = $value['target_id'];
+        $user = \Drupal\user\Entity\User::load($id);
+        if ($user) {
+          $result = civicrm_api3('Contact', 'get', array(
+            'sequential' => 1,
+            'return' => array("first_name", "last_name", "current_employer"),
+            'email' => $user->mail->value,
+          ));
+          $speaker = $result['values'][0];
+          $form['fieldset_speakers']['field_speaker_first_name_' . $key] = [
+            '#type' => 'textfield',
+            '#title' => t('First Name'),
+            '#default_value' => $speaker['first_name'],
+            '#disabled' => TRUE,
+            '#weight' => $weight,
+          ];
+          $weight++;
+          $form['fieldset_speakers']['field_speaker_last_name_' . $key] = [
+            '#type' => 'textfield',
+            '#title' => t('Last Name'),
+            '#default_value' => $speaker['last_name'],
+            '#disabled' => TRUE,
+            '#weight' => $weight,
+          ];
+          $weight++;
+          $form['fieldset_speakers']['field_speaker_current_employer_' . $key] = [
+            '#type' => 'textfield',
+            '#title' => t('Company/Organization'),
+            '#default_value' => $speaker['current_employer'],
+            '#disabled' => TRUE,
+            '#weight' => $weight,
+          ];
+          $weight++;
+          $form['fieldset_speakers']['field_speaker_rating_' . $key] = [
+            '#type' => 'select',
+            '#title' => t('Rate This Speaker'),
+            '#options' => [
+              1 => 1,
+              2 => 2,
+              3 => 3,
+              4 => 4,
+              5 => 5,
+            ],
+            '#weight' => $weight,
+          ];
+          $weight++;
+        }
       }
     }
   }
