@@ -20,6 +20,7 @@ function nesea_evals_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $fo
     $form['fieldset_speakers'] = [
       '#type' => 'fieldset',
       '#title' => 'Rate the speakers: Where 1 is poor and 5 is excellent',
+      '#weight' => $weight,
     ];
     $weight++;
     foreach ($speakersArray as $key => $value) {
