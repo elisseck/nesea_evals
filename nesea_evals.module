@@ -1,5 +1,6 @@
 <?php
 use Drupal\node\Entity\Node;
+use Drupal\Core\Datetime\DrupalDateTime;
 
 function nesea_evals_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id) {
   if ($form_id == 'node_session_evaluation_form') {
@@ -94,7 +95,9 @@ function nesea_evals_submit_evaluation(&$form, \Drupal\Core\Form\FormStateInterf
   if ($values['field_rate_the_speakers'][0]['target_id'] == NULL) {
     $target_ids = [];
     for ($i = 0; $i < $values['count_speakers']; $i++) {
-      $title = $values['field_speaker_first_name_' . $i] . ' ' . $values['field_speaker_last_name_' . $i] . ' rating - ' . \Drupal::time()->getCurrentTime('m/d/Y H:i:s');
+      $currentTime = \Drupal::time()->getCurrentTime();
+      $formattedTime = (new DrupalDateTime($currentTime))->format('Y-m-d H:i:s');
+      $title = $values['field_speaker_first_name_' . $i] . ' ' . $values['field_speaker_last_name_' . $i] . ' rating - ' . $formattedTime;
       $node = Node::create([
         'type' => 'presenter_rating',
         'title' => $title,
@@ -114,6 +117,6 @@ function nesea_evals_submit_evaluation(&$form, \Drupal\Core\Form\FormStateInterf
       $node->save();
       $target_ids[] = $node->id();
     }
-    $form_state->setValue('field_rate_the_speakers', [['target_id' => $target_ids]]);
+    $form_state->setValue('field_rate_the_speakers', ['target_id' => $target_ids]);
   }
 }
