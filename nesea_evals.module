@@ -91,6 +91,28 @@ function nesea_evals_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $fo
 function nesea_evals_submit_evaluation(&$form, \Drupal\Core\Form\FormStateInterface $form_state) {
   $values = $form_state->getValues();
   if ($values['field_rate_the_speakers'][0]['target_id'] == NULL) {
-
+    $target_ids = [];
+    for ($i = 0; $i < $values['count_speakers']; $i++) {
+      $title = $values['field_speaker_first_name_' . $i] . ' ' . $values['field_speaker_last_name_' . $i] . ' rating - ' . \Drupal::time()->getCurrentTime('m/d/Y H:i:s');
+      $node = Node::create([
+        'type' => 'presenter_rating',
+        'title' => $title,
+        'field_speaker_first_name' => [
+          'value' => $values['field_speaker_first_name_' . $i],
+        ],
+        'field_speaker_last_name' => [
+          'value' => $values['field_speaker_last_name_' . $i],
+        ],
+        'field_speaker_organization' => [
+          'value' => $values['field_speaker_current_employer_' . $i],
+        ],
+        'field_rate_this_speaker' => [
+          'value' => $values['field_speaker_rating_' . $i],
+        ],
+      ]);
+      $node->save();
+      $target_ids[] = $node->id();
+    }
+    $form_state->setValue('field_rate_the_speakers', [['target_id' => $target_ids]]);
   }
 }
