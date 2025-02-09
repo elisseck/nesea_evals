@@ -11,7 +11,7 @@ function nesea_evals_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $fo
       $node = \Drupal\node\Entity\Node::load($sessionID);
       $conference_node = \Drupal\node\Entity\Node::load($conferenceID);
       $form['actions']['submit']['#submit'][] = 'nesea_evals_submit_evaluation';
-      $form['title']['#default_value'] = $node->getTitle()  . ' Evaluation (submitted from: ' . \Drupal::request()->getClientIp() . ')';
+      $form['title']['widget'][0]['value']['#default_value'] = $node->getTitle()  . ' Evaluation (submitted from: ' . \Drupal::request()->getClientIp() . ')';
       $form['title']['#access'] = FALSE;
       $form['field_session']['widget'][0]['target_id']['#default_value'] = $node;
       $form['field_conference']['widget'][0]['target_id']['#default_value'] = $conference_node;
@@ -28,6 +28,7 @@ function nesea_evals_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $fo
         '#weight' => $weight,
       ];
       $weight++;
+      $num_speakers = count($speakersArray);
       foreach ($speakersArray as $key => $value) {
         $id = $value['target_id'];
         $user = \Drupal\user\Entity\User::load($id);
@@ -77,14 +78,19 @@ function nesea_evals_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $fo
           $weight++;
         }
       }
+      $form['count_speakers'] = [
+        '#type' => 'textfield',
+        '#title' => 'number of speakers',
+        '#default_value' => $num_speakers,
+        '#access' => FALSE
+      ];
     }
   }
 }
 
 function nesea_evals_submit_evaluation(&$form, \Drupal\Core\Form\FormStateInterface $form_state) {
-  var_dump($form_state->getValues());
-  die();
-  foreach ($form_state->getValues() as $key => $value) {
+  $values = $form_state->getValues();
+  if ($values['field_rate_the_speakers'][0]['target_id'] == NULL) {
 
   }
 }
